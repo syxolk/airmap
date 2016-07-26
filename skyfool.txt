@@ -1,3 +1,7 @@
 http://www.skyfool.de/Luftraeume/germany_2016.kmz
-http://www.skyfool.de/Luftraeume/swiss_2014.kmz
+http://www.skyfool.de/Luftraeume/swiss_2015.kmz
 http://www.skyfool.de/Luftraeume/france_2015.kmz
+http://www.skyfool.de/Luftraeume/italy_2009.kmz
+http://www.skyfool.de/Luftraeume/slovakia_2011.kmz
+http://www.skyfool.de/Luftraeume/czech_2011.kmz
+http://www.skyfool.de/Luftraeume/australia_2009.kmz

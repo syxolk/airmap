@@ -2,7 +2,7 @@ const restify = require('restify');
 const validator = require('express-validator');
 const bluebird = require('bluebird');
 const Sequelize = require('sequelize');
-const fs = require('fs');
+const fs = bluebird.promisifyAll(require('fs'));
 const config = require('./config');
 
 const sequelize = new Sequelize(config.db, {
@@ -15,7 +15,7 @@ const sequelize = new Sequelize(config.db, {
 const Import = sequelize.define('Import', {
     id: {
         primaryKey: true,
-        type: Sequelize.UUID
+        type: Sequelize.TEXT
     },
     name: {
         type: Sequelize.TEXT,
@@ -56,10 +56,13 @@ sequelize.sync()
 .then(function(numOfImports) {
     if(numOfImports === 0 && config.autoPopulate) {
         console.log('Populate database...');
-        const sql = fs.readFileSync('./data.sql', 'utf8');
-        return sequelize.query(sql, {raw: true, logging: false});
-    } else {
-        bluebird.resolve();
+        return fs.readdirAsync('data').filter(function(file) {
+            return file.endsWith('.sql');
+        }).map(function(file) {
+            return fs.readFileAsync('data/' + file, 'utf8');
+        }).each(function(sql) {
+            return sequelize.query(sql, {raw: true, logging: false});
+        });
     }
 })
 .then(function() {

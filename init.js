@@ -2,9 +2,11 @@ const http = require('http');
 const fs = require('fs');
 const unzip = require('unzip');
 const async = require('async');
+const crypto = require('crypto');
 const Writable = require('stream').Writable;
 const kml2sql = require('./kml2sql').kml2sql;
 
+fs.mkdirSync('data');
 processURLFile('skyfool.txt');
 
 /**
@@ -15,13 +17,12 @@ function processURLFile(file) {
         if(err) throw err;
         const urlList = data.toString()
             .replace(/\r\n/g,'\n').split('\n') // split lines
-            .filter(x => x.length > 0); // remove empty lines
+            .filter(x => x.length > 0) // remove empty lines
+            .filter(x => !x.startsWith('#')); // remove comment lines
 
-        async.map(urlList, processURL, function(err, sqlList) {
+        async.eachSeries(urlList, processURL, function(err) {
             if(err) throw err;
-            fs.writeFile('data.sql', sqlList.join('\n'), function(err) {
-                if(err) throw err;
-            });
+            console.log('Finished.');
         });
     });
 }
@@ -30,11 +31,14 @@ function processURLFile(file) {
  * Download KMZ file, extract the KML file and convert to SQL
  */
 function processURL(url, callback) {
+    console.log('Process %s', url);
     http.get(url, response => {
         response.pipe(unzip.Parse())
             .on('entry', entry => {
                 if(entry.path === 'doc.kml') {
-                    kml2sql(url, entry, callback);
+                    const importId = crypto.createHash('md5').update(url).digest('hex');
+                    const fd = fs.createWriteStream('data/' + importId + '.sql');
+                    kml2sql(importId, url, entry, fd, callback);
                 }
             });
     });

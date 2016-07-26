@@ -53,6 +53,20 @@ Response:
 }
 ```
 
+## Data
+Restricted areas are downloaded from [skyfool.de](http://www.skyfool.de/)
+for the following countries:
+- Germany
+- Swiss
+- France
+- Italy
+- Slovakia
+- Czech
+- Australia
+
+The data sets may not be complete or up-to-date. The developers of this
+project are not responsible for any wrong or outdated information.
+
 ## Docker
 Set `db` in `config.js` to `postgres://postgres@postgres:5432/postgres`.
 

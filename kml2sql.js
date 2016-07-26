@@ -3,7 +3,6 @@ const fs = require('fs');
 const sax = require('sax');
 const cheerio = require('cheerio');
 const escape = require('pg-escape');
-const uuid = require('node-uuid');
 
 function coordsToWKT(coords) {
     coords = coords.trim().split(/ +/);
@@ -41,19 +40,16 @@ function parseDescription(html) {
     return result;
 }
 
-module.exports.kml2sql = function(importName, input, callback) {
-    const importId = uuid.v4();
-
+module.exports.kml2sql = function(importId, importName, input, out, callback) {
     var saxStream = require("sax").createStream(false, {
         trim: true,
         normalize: true,
         lowercase: true
     });
 
-    const result = [];
-    result.push('insert into import(id, name) values\n');
-    result.push(escape('(%L, %L)', importId, importName) + ';\n');
-    result.push(`insert into area(import_id, class, name, floor, ceiling, boundary) values\n`);
+    out.write('insert into import(id, name) values\n');
+    out.write(escape('(%L, %L)', importId, importName) + ';\n');
+    out.write(`insert into area(import_id, class, name, floor, ceiling, boundary) values\n`);
     var placemark = {}, record = false, textBuffer;
     var first = true, inPlacemark = false;
     var folders = [];
@@ -78,11 +74,11 @@ module.exports.kml2sql = function(importName, input, callback) {
             var wkt = coordsToWKT(placemark.coords);
             if(wkt) {
                 if(! first) {
-                    result.push(',\n');
+                    out.write(',\n');
                 }
                 first = false;
                 const desc = parseDescription(placemark.description);
-                result.push(escape(`(%L, %L, %L, %L, %L, ST_GeogFromText(%L))`,
+                out.write(escape(`(%L, %L, %L, %L, %L, ST_GeogFromText(%L))`,
                     importId, desc.class || (folders.length >= 2 ? folders[1] : null),
                     placemark.name, desc.floor || null, desc.ceiling || null, wkt));
             }
@@ -118,7 +114,8 @@ module.exports.kml2sql = function(importName, input, callback) {
         }
     });
     saxStream.on('end', function() {
-        callback(null, result.join('') + ';');
+        out.end();
+        callback(null);
     });
 
     input.pipe(saxStream);
