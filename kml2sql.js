@@ -9,7 +9,7 @@ function coordsToWKT(coords) {
     coords = coords.trim().split(/ +/);
     if(coords.length <= 3) return null;
     return 'POLYGON((' + coords.map(function(point) {
-        return point.split(',').join(' ');
+        return point.split(',').slice(0,2).join(' ');
     }).join(',') + '))';
 }
 

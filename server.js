@@ -30,7 +30,7 @@ const Area = sequelize.define('Area', {
     class: Sequelize.TEXT,
     floor: Sequelize.INTEGER,
     ceiling: Sequelize.INTEGER,
-    boundary: Sequelize.GEOGRAPHY('POLYGONZ', 4326)
+    boundary: Sequelize.GEOGRAPHY('POLYGON', 4326)
 }, {
     tableName: 'area',
     indexes: [
