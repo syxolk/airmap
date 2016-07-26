@@ -1,0 +1,20 @@
+{
+  "name": "airmap",
+  "version": "1.0.0",
+  "description": "Web service that serves restricted flight areas",
+  "author": "Hans Kirchner <hans.kirchner.info@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "async": "^2.0.1",
+    "bluebird": "^3.4.1",
+    "cheerio": "^0.20.0",
+    "express-validator": "^2.20.8",
+    "node-uuid": "^1.4.7",
+    "pg": "^6.0.3",
+    "pg-hstore": "^2.3.2",
+    "restify": "^4.1.1",
+    "sax": "^1.2.1",
+    "sequelize": "^3.23.6",
+    "unzip": "^0.1.11"
+  }
+}
