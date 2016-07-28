@@ -6,6 +6,7 @@ const fs = bluebird.promisifyAll(require('fs'));
 const config = require('./config');
 
 const sequelize = new Sequelize(config.db, {
+    logging: process.env.NODE_ENV === 'production' ? false : console.log,
     define: {
         timestamps: false,
         freezeTableName: true
