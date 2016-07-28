@@ -30,6 +30,7 @@ Parameters:
 - `r` (optional, defaults to 0): Radius of circle that is checked for restricted areas (in meters)
 - `geojson` (optional, defaults to false): Return boundary of areas as GeoJSON
 - `kml` (optional, defaults to false): Return boundary of areas as KML
+- `compass` (optional, defaults to false): Return cardinal direction (0 = N, 90 = E, 180 = S, 270 = W) to center of area, relative from given location
 
 Response:
 ```

@@ -77,6 +77,7 @@ sequelize.sync()
         req.checkQuery('r', 'Radius is optional and must be float').optional().isFloat({min: 0});
         req.checkQuery('geojson', 'GeoJSON is optional and must be boolean').optional().isBoolean();
         req.checkQuery('kml', 'KML is optional and must be boolean').optional().isBoolean();
+        req.checkQuery('compass', 'Compass is optional and must be boolean').optional().isBoolean();
 
         const errors = req.validationErrors();
 
@@ -89,6 +90,7 @@ sequelize.sync()
         const r = Math.min(req.sanitizeQuery('r').toFloat() || 0, config.maxRadius);
         const geojson = req.sanitizeQuery('geojson').toBoolean(true);
         const kml = req.sanitizeQuery('kml').toBoolean(true);
+        const compass = req.sanitizeQuery('compass').toBoolean(true);
 
         const attributes = ['name', 'class', 'floor', 'ceiling',
             [sequelize.fn('ST_Distance', sequelize.col('boundary'), sequelize.cast(sequelize.fn('ST_SetSRID',
@@ -98,6 +100,12 @@ sequelize.sync()
         }
         if(kml) {
             attributes.push([sequelize.fn('ST_AsKML', sequelize.col('boundary')), 'kml']);
+        }
+        if(compass) {
+            attributes.push([sequelize.fn('degrees', sequelize.fn('ST_Azimuth',
+                sequelize.cast(sequelize.fn('ST_SetSRID', sequelize.fn('ST_Point', lng, lat), 4326), 'geography'),
+                sequelize.cast(sequelize.fn('ST_Centroid', sequelize.cast(sequelize.col('boundary'), 'geometry')), 'geography')
+            )), 'compass']);
         }
 
         Area.findAll({
@@ -112,6 +120,7 @@ sequelize.sync()
                 data: areas.map(x => {
                     x = x.toJSON();
                     if(geojson) x.geojson = JSON.parse(x.geojson);
+                    if(compass) x.compass = normalizeAngle(x.compass);
                     return x;
                 })
             });
@@ -153,4 +162,8 @@ function buildValidationErrorResponse(errors)  {
         status: 'fail',
         data: data
     }
+}
+
+function normalizeAngle(x) {
+    return Math.round(x < 0 ? x + 360 : x);
 }
