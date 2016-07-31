@@ -113,7 +113,11 @@ sequelize.sync()
             where: sequelize.where(sequelize.fn('ST_DWithin',
                 sequelize.col('boundary'), sequelize.cast(sequelize.fn('ST_SetSRID',
                 sequelize.fn('ST_Point', lng, lat), 4326), 'geography'), r), true),
-            order: [[sequelize.col('distance'), 'ASC']]
+            order: [
+                [sequelize.col('distance'), 'ASC'],
+                [sequelize.col('floor'), 'ASC'],
+                [sequelize.col('ceiling'), 'ASC']
+            ]
         }).then(function(areas) {
             res.send({
                 status: 'success',
